@@ -9,33 +9,33 @@ class MemoryStorage
         @modification_counter = 0
     end
 
-    def set(name,flag,time,bits,value)
+    def set(name,attribute_retiever,value)
         self.delete_all_expired_keys
         self.modification_counter = self.modification_counter + 1
-        t = Time.now + time
-        key = Key.new(name,flag,t,bits,value,self.modification_counter)
+        t = Time.now + attribute_retiever.time
+        key = Key.new(name,attribute_retiever.flag,t,attribute_retiever.bits,value,self.modification_counter)
         self.delete_key(name)
         self.key_list.push(key)
         return Response.new("STORED",true)
     end
 
-    def add(name,flag,time,bits,value)
+    def add(name,attribute_retiever,value)
         self.delete_all_expired_keys
         if self.key_exist(name)
             return Response.new("KEY ALREADY EXIST",false)
         else
             self.modification_counter = self.modification_counter + 1
-            t = Time.now + time
-            key = Key.new(name,flag,t,bits,value,self.modification_counter)
+            t = Time.now + attribute_retiever.time
+            key = Key.new(name,attribute_retiever.flag,t,attribute_retiever.bits,value,self.modification_counter)
             self.key_list.push(key)
             return Response.new("STORED",true)
         end
     end
 
-    def replace(name,flag,time,bits,value)
+    def replace(name,attribute_retiever,value)
         self.delete_all_expired_keys
         if self.key_exist(name)
-            self.set(name,flag,time,bits,value)
+            self.set(name,attribute_retiever,value)
         else
             return Response.new("KEY DOES NOT EXIST",false)
         end
@@ -72,12 +72,12 @@ class MemoryStorage
         end
     end
 
-    def cas(name,flag,time,bits,value,modification_value)
+    def cas(name,attribute_retiever,value,modification_value)
         self.delete_all_expired_keys
         if self.key_exist(name)
             key = self.retrieve_key(name)
             if modification_value == key.modification_value
-                self.set(name,flag,time,bits,value)
+                self.set(name,attribute_retiever,value)
             else
                 return Response.new("EXIST",true)
             end
@@ -137,12 +137,3 @@ class MemoryStorage
         end
     end
 end
-
-#firstSet = MemoryStorage.new()
-#firstSet.set("rafa",0,90,4,"weno")
-#firstSet.set("pepe",0,1,4,"lala")
-#firstSet.set("lola",0,90,4,"popo")
-#puts firstSet.key_list
-#value = gets.chomp
-#firstSet.delete_all_expired_keys()
-#puts firstSet.key_list

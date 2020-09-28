@@ -1,6 +1,5 @@
 class Key
 
-
     attr_accessor :key_name, :flag, :time, :bits, :value, :modification_value
 
     def initialize(name,flag,time, bits,value,modification_value)

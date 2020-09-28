@@ -9,14 +9,11 @@ class BusinessLogic
         @memStorage = MemoryStorage.new
     end
 
-
     def set(request,value)
         if self.validate_value(request,value)
             keyName = request[1]
-            flag = self.parse_flag(request[2])
-            time = self.parse_time(request[3])
-            bits = self.parse_bits(request[4])
-            return memStorage.set(keyName,flag,time,bits,value)
+            attribute_retiever = self.create_attribute_retriever(request)
+            return memStorage.set(keyName,attribute_retiever,value)
         else
             return Response.new("ERROR: The value does not match bits requested",false)
         end
@@ -25,10 +22,8 @@ class BusinessLogic
     def add(request,value)
         if self.validate_value(request,value)
             keyName = request[1]
-            flag = self.parse_flag(request[2])
-            time = self.parse_time(request[3])
-            bits = self.parse_bits(request[4])
-            return memStorage.add(keyName,flag,time,bits,value)
+            attribute_retiever = self.create_attribute_retriever(request)
+            return memStorage.add(keyName,attribute_retiever,value)
         else
             return Response.new("ERROR: The value does not match bits requested",false)
         end
@@ -37,10 +32,8 @@ class BusinessLogic
     def replace(request,value)
         if self.validate_value(request,value)
             keyName = request[1]
-            flag = self.parse_flag(request[2])
-            time = self.parse_time(request[3])
-            bits = self.parse_bits(request[4])
-            return memStorage.replace(keyName,flag,time,bits,value)
+            attribute_retiever = self.create_attribute_retriever(request)
+            return memStorage.replace(keyName,attribute_retiever,value)
         else
             return Response.new("ERROR: The value does not match bits requested",false)
         end
@@ -69,11 +62,9 @@ class BusinessLogic
     def cas(request,value)
         if self.validate_value(request,value)
             keyName = request[1]
-            flag = self.parse_flag(request[2])
-            time = self.parse_time(request[3])
-            bits = self.parse_bits(request[4])
+            attribute_retiever = self.create_attribute_retriever(request)
             modification_value = self.parse_modification_value(request[5])
-            return memStorage.cas(keyName,flag,time,bits,value,modification_value)
+            return memStorage.cas(keyName,attribute_retiever,value,modification_value)
         else
             return Response.new("ERROR: The value does not match bits requested",false)
         end
@@ -89,8 +80,8 @@ class BusinessLogic
         return memStorage.gets(keyName)
     end
 
-    def check_range(flag,time,bits)
-        if flag >= 0 && flag <MAXIMUM_FLAG && time > 0 && time < MAXIMUM_TIME && bits > 0 && bits < MAXIMUM_BITS_SIZE
+    def check_range(attribute_retiever)
+        if attribute_retiever.flag >= 0 && attribute_retiever.flag <MAXIMUM_FLAG && attribute_retiever.time > 0 && attribute_retiever.time < MAXIMUM_TIME && attribute_retiever.bits > 0 && attribute_retiever.bits < MAXIMUM_BITS_SIZE
             return true
         else
             return false
@@ -101,10 +92,8 @@ class BusinessLogic
         if request.length != 5
             return Response.new("ERROR: Wrong number of arguments",false)
         end
-        flag = self.parse_flag(request[2])
-        time = self.parse_time(request[3])
-        bits = self.parse_bits(request[4])
-        if self.check_range(flag,time,bits)
+        attribute_retiever = self.create_attribute_retriever(request)
+        if self.check_range(attribute_retiever)
             return Response.new("SUCCESS",true)
         else
             return Response.new("ERROR: Flag,time or bits exeeded maximum or where less than 0",false)
@@ -115,11 +104,9 @@ class BusinessLogic
         if request.length != 6
             return Response.new("ERROR: Wrong number of arguments",false)
         end
-        flag = self.parse_flag(request[2])
-        time = self.parse_time(request[3])
-        bits = self.parse_bits(request[4])
+        attribute_retiever = self.create_attribute_retriever(request)
         modification_value = self.parse_modification_value(request[5])
-        if self.check_range(flag,time,bits)
+        if self.check_range(attribute_retiever)
             return Response.new("SUCCESS",true)
         else
             return Response.new("ERROR: Flag,time or bits exeeded maximum or where less than 0",false)
@@ -139,6 +126,13 @@ class BusinessLogic
             return false
         end
         return true
+    end
+
+    def create_attribute_retriever(request)
+        flag = self.parse_flag(request[2])
+        time = self.parse_time(request[3])
+        bits = self.parse_bits(request[4])
+        return AttributeRetriever.new(flag,time,bits)
     end
 
     def parse_flag(flag)
