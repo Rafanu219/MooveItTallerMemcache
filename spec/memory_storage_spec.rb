@@ -1,4 +1,4 @@
-require_relative '../memory_storage'
+require_relative '../app/memory_storage'
 
 RSpec.describe MemoryStorage do
     describe "Memory storage" do

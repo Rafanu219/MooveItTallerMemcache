@@ -18,7 +18,7 @@ class BusinessLogic
             bits = self.parse_bits(request[4])
             return memStorage.set(keyName,flag,time,bits,value)
         else
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: The value does not match bits requested",false)
         end
     end
 
@@ -30,7 +30,7 @@ class BusinessLogic
             bits = self.parse_bits(request[4])
             return memStorage.add(keyName,flag,time,bits,value)
         else
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: The value does not match bits requested",false)
         end
     end
 
@@ -42,7 +42,7 @@ class BusinessLogic
             bits = self.parse_bits(request[4])
             return memStorage.replace(keyName,flag,time,bits,value)
         else
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: The value does not match bits requested",false)
         end
     end
 
@@ -52,7 +52,7 @@ class BusinessLogic
             bits = self.parse_bits(request[4])
             return memStorage.append(keyName,bits,value)
         else
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: The value does not match bits requested",false)
         end
     end
 
@@ -62,7 +62,7 @@ class BusinessLogic
             bits = self.parse_bits(request[4])
             return memStorage.prepend(keyName,bits,value)
         else
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: The value does not match bits requested",false)
         end
     end
 
@@ -75,7 +75,7 @@ class BusinessLogic
             modification_value = self.parse_modification_value(request[5])
             return memStorage.cas(keyName,flag,time,bits,value,modification_value)
         else
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: The value does not match bits requested",false)
         end
     end
 
@@ -99,7 +99,7 @@ class BusinessLogic
 
     def validate_storage_command(request)
         if request.length != 5
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: Wrong number of arguments",false)
         end
         flag = self.parse_flag(request[2])
         time = self.parse_time(request[3])
@@ -107,13 +107,13 @@ class BusinessLogic
         if self.check_range(flag,time,bits)
             return Response.new("SUCCESS",true)
         else
-            return Response.new("ERROR: Flag,time or bits exeeded maximum",false)
+            return Response.new("ERROR: Flag,time or bits exeeded maximum or where less than 0",false)
         end
     end
 
     def validate_cas_storage_command(request)
         if request.length != 6
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: Wrong number of arguments",false)
         end
         flag = self.parse_flag(request[2])
         time = self.parse_time(request[3])
@@ -122,13 +122,13 @@ class BusinessLogic
         if self.check_range(flag,time,bits)
             return Response.new("SUCCESS",true)
         else
-            return Response.new("ERROR: Flag,time or bits exeeded maximum",false)
+            return Response.new("ERROR: Flag,time or bits exeeded maximum or where less than 0",false)
         end
     end
 
     def validate_retrieval_command(request)
         if request.length != 2
-            return Response.new("ERROR",false)
+            return Response.new("ERROR: Wrong number of arguments",false)
         end
         return Response.new("SUCCES",true)
     end
