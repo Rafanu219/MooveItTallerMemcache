@@ -13,36 +13,75 @@ loop do
             command = request[0]
             case command
             when "get"
-              sock.write "es get\n"
-            when "gets"
-              sock.write "es gets\n"
-            when "set"
-              response = businessLogic.validate_set_command(request)
-              puts "Antes de if"
+              response = businessLogic.validate_retrieval_command(request)
               if response.success == true
-                puts "despues de if"
+                response = businessLogic.get(request)
+                sock.write response.message + "\n"
+              else
+                sock.write response.message + "\n"
+              end
+            when "gets"
+              response = businessLogic.validate_retrieval_command(request)
+              if response.success == true
+                response = businessLogic.gets(request)
+                sock.write response.message + "\n"
+              else
+                sock.write response.message + "\n"
+              end
+            when "set"
+              response = businessLogic.validate_storage_command(request)
+              if response.success == true
                 value = sock.gets( "\r\n" ).chomp( "\r\n" )
-                puts request
-                puts value
                 response = businessLogic.set(request,value)
-                if response.success == true
-                  sock.write response.message + "\n"
-                else
-                  sock.write response.message + "\n"
-                end
+                sock.write response.message + "\n"
               else
                 sock.write response.message + "\n"
               end
             when "append"
-              sock.write "es append\n"
+              response = businessLogic.validate_storage_command(request)
+              if response.success == true
+                value = sock.gets( "\r\n" ).chomp( "\r\n" )
+                response = businessLogic.append(request,value)
+                sock.write response.message + "\n"
+              else
+                sock.write response.message + "\n"
+              end
             when "prepend"
-              sock.write "es prepend\n"
+              response = businessLogic.validate_storage_command(request)
+              if response.success == true
+                value = sock.gets( "\r\n" ).chomp( "\r\n" )
+                response = businessLogic.prepend(request,value)
+                sock.write response.message + "\n"
+              else
+                sock.write response.message + "\n"
+              end
             when "add"
-              sock.write "es add\n"
+              response = businessLogic.validate_storage_command(request)
+              if response.success == true
+                value = sock.gets( "\r\n" ).chomp( "\r\n" )
+                response = businessLogic.add(request,value)
+                sock.write response.message + "\n"
+              else
+                sock.write response.message + "\n"
+              end
             when "cas"
-              sock.write "es cas\n"
+              response = businessLogic.validate_cas_storage_command(request)
+              if response.success == true
+                value = sock.gets( "\r\n" ).chomp( "\r\n" )
+                response = businessLogic.cas(request,value)
+                sock.write response.message + "\n"
+              else
+                sock.write response.message + "\n"
+              end
             when "replace"
-              sock.write "es replace\n"
+              response = businessLogic.validate_storage_command(request)
+              if response.success == true
+                value = sock.gets( "\r\n" ).chomp( "\r\n" )
+                response = businessLogic.replace(request,value)
+                sock.write response.message + "\n"
+              else
+                sock.write response.message + "\n"
+              end
             when "quit"
               raise SystemExit
             else 

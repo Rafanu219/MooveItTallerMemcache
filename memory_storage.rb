@@ -10,9 +10,9 @@ class MemoryStorage
     end
 
     def set(name,flag,time,bits,value)
+        self.delete_all_expired_keys
         self.modification_counter = self.modification_counter + 1
         t = Time.now + time
-        puts t
         key = Key.new(name,flag,t,bits,value,self.modification_counter)
         self.delete_key(name)
         self.key_list.push(key)
@@ -20,8 +20,9 @@ class MemoryStorage
     end
 
     def add(name,flag,time,bits,value)
+        self.delete_all_expired_keys
         if self.key_exist(name)
-            return Response.new("LA KEY QUE DESEA CREAR YA EXISTE",false)
+            return Response.new("KEY ALREADY EXIST",false)
         else
             self.modification_counter = self.modification_counter + 1
             t = Time.now + time
@@ -31,24 +32,79 @@ class MemoryStorage
         end
     end
 
+    def replace(name,flag,time,bits,value)
+        self.delete_all_expired_keys
+        if self.key_exist(name)
+            self.set(name,flag,time,bits,value)
+        else
+            return Response.new("KEY DOES NOT EXIST",false)
+        end
+    end
+    
+
+    def append(name,bits,value)
+        self.delete_all_expired_keys
+        if self.key_exist(name)
+            self.modification_counter = self.modification_counter + 1
+            key = self.retrieve_key(name)
+            key.modification_value = self.modification_counter
+            new_value = key.value + value
+            key.value = new_value
+            key.bits = key.bits + bits
+            return Response.new("STORED",true)
+        else
+            return Response.new("KEY DOES NOT EXIST",false)
+        end
+    end
+
+    def prepend(name,bits,value)
+        self.delete_all_expired_keys
+        if self.key_exist(name)
+            self.modification_counter = self.modification_counter + 1
+            key = self.retrieve_key(name)
+            key.modification_value = self.modification_counter
+            new_value = value + key.value
+            key.value = new_value
+            key.bits = key.bits + bits
+            return Response.new("STORED",true)
+        else
+            return Response.new("KEY DOES NOT EXIST",false)
+        end
+    end
+
+    def cas(name,flag,time,bits,value,modification_value)
+        self.delete_all_expired_keys
+        if self.key_exist(name)
+            key = self.retrieve_key(name)
+            if modification_value == key.modification_value
+                self.set(name,flag,time,bits,value)
+            else
+                return Response.new("EXIST",true)
+            end
+        else
+            return Response.new("KEY DOES NOT EXIST",false)
+        end
+    end
+
     def get(keyName)
+        self.delete_all_expired_keys
         key = key_list.find { |key| key.key_name == keyName }
         if key != nil
-            message =  "VALUE #{key.key_name} #{key.flag} #{key.bits} \n#{key.value}"
+            message =  "VALUE #{key.key_name} #{key.flag} #{key.bits} \n#{key.value} \nEND"
             return Response.new(message,true)
         else
-            return Response.new("NO SE ENCONTRO NINGUNA KEY CON ESE NOMBRE",false)
+            return Response.new("KEY DOES NOT EXIST",false)
         end
     end
 
     def gets(keyName)
+        self.delete_all_expired_keys
         key = key_list.find { |key| key.key_name == keyName }
         if key != nil
-            message =  "VALUE #{key.key_name} #{key.flag} #{key.bits} #{key.modification_value}\n#{key.value}"
-            puts message
+            message =  "VALUE #{key.key_name} #{key.flag} #{key.bits} #{key.modification_value}\n#{key.value} \nEND"
             return Response.new(message,true)
         else
-            return Response.new("NO SE ENCOTRO NINGUNA KEY CON ESE NOMBRE",false)
+            return Response.new("KEY DOES NOT EXIST",false)
         end
     end
 
@@ -65,13 +121,16 @@ class MemoryStorage
         end
     end
 
+    def retrieve_key(keyName)
+        return key_list.find { |key| key.key_name == keyName }
+    end
+        
     def delete_all_expired_keys
         key_list.each { |key| self.delete_expired_key(key) }
     end
 
     def delete_expired_key(key)
         t = Time.now
-        puts t
         is_expired = key.time <=> t
         if  is_expired == -1
             self.delete_key(key.key_name)
