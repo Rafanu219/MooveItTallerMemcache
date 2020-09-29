@@ -4,7 +4,7 @@ require 'timeout'
 # connect to server
 
 sock = begin
-           Timeout::timeout( 1 ) { TCPSocket.open( 'localhost', 2000 ) }
+           Timeout::timeout( 1 ) { TCPSocket.open( 'localhost', 2121 ) }
        rescue StandardError, RuntimeError => ex
            raise "cannot connect to server: #{ex}"
        end

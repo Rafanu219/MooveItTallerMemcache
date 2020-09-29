@@ -1,6 +1,7 @@
 require_relative 'response'
 require_relative 'memory_storage'
 require_relative 'constants'
+require_relative 'attribute_retriever'
 
 class BusinessLogic
     attr_accessor :memStorage
@@ -92,11 +93,15 @@ class BusinessLogic
         if request.length != 5
             return Response.new("ERROR: Wrong number of arguments",false)
         end
-        attribute_retiever = self.create_attribute_retriever(request)
-        if self.check_range(attribute_retiever)
-            return Response.new("SUCCESS",true)
+        if is_number?(request[2]) && is_number?(request[3]) && is_number?(request[4])
+            attribute_retriever = self.create_attribute_retriever(request)
+            if self.check_range(attribute_retriever)
+                return Response.new("SUCCESS",true)
+            else
+                return Response.new("ERROR: Flag,time or bits exeeded maximum or where less than 0",false)
+            end
         else
-            return Response.new("ERROR: Flag,time or bits exeeded maximum or where less than 0",false)
+            return Response.new("ERROR",false)
         end
     end
 
@@ -104,12 +109,17 @@ class BusinessLogic
         if request.length != 6
             return Response.new("ERROR: Wrong number of arguments",false)
         end
-        attribute_retiever = self.create_attribute_retriever(request)
-        modification_value = self.parse_modification_value(request[5])
-        if self.check_range(attribute_retiever)
-            return Response.new("SUCCESS",true)
+        if is_number?(request[2]) && is_number?(request[3]) && is_number?(request[4]) && is_number?(request[5])
+            attribute_retriever = self.create_attribute_retriever(request)
+            modification_value = self.parse_modification_value(request[5])
+            if self.check_range(attribute_retriever)
+                return Response.new("SUCCESS",true)
+            else
+                return Response.new("ERROR: Flag,time or bits exeeded maximum or where less than 0",false)
+            end
         else
-            return Response.new("ERROR: Flag,time or bits exeeded maximum or where less than 0",false)
+            puts "estoy aca"
+            return Response.new("ERROR",false)
         end
     end
 
@@ -135,35 +145,24 @@ class BusinessLogic
         return AttributeRetriever.new(flag,time,bits)
     end
 
+    def is_number? (string)
+        true if Integer(string) rescue false
+    end
+      
+
     def parse_flag(flag)
-        begin
-            parsedFlag = Integer(flag)
-            rescue
-                return Response.new("ERROR: Flag must be an integer",false)
-        end
+        return Integer(flag)
     end
 
     def parse_time(time)
-        begin
-            parsedTime = Integer(time)
-            rescue
-                return Response.new("ERROR: Time must be an integer",false)
-        end
+        return Integer(time)
     end
 
     def parse_bits(bits)
-        begin
-            parsedBits = Integer(bits)
-            rescue
-                return Response.new("ERROR: Bits must be an integer",false)
-        end
+        return Integer(bits)
     end
 
     def parse_modification_value(mod_value)
-        begin
-            modification_value = Integer(mod_value)
-            rescue
-                return Response.new("ERROR: Modification value must be an integer",false)
-        end
+        return Integer(mod_value)
     end
 end

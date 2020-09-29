@@ -8,42 +8,42 @@ RSpec.describe BusinessLogic do
         end
 
         it "Calls the method set when value is not correct" do
-            request = ["Jhon","0","60", "2"]
+            request = ["set","Jhon","0", "80","2"]
             response = @business_logic.set(request,"Doe")
             expect(response.message).to eq("ERROR: The value does not match bits requested")
             expect(response.success).to be false
         end
 
         it "Calls the method add when value is not correct" do
-            request = ["Jhon","0","60", "2"]
+            request = ["add","Jhon","0", "80","2"]
             response = @business_logic.add(request,"Doe")
             expect(response.message).to eq("ERROR: The value does not match bits requested")
             expect(response.success).to be false
         end
 
         it "Calls the method replace when value is not correct" do
-            request = ["Jhon","0","60", "2"]
+            request = ["replace","Jhon","0", "80","2"]
             response = @business_logic.replace(request,"Doe")
             expect(response.message).to eq("ERROR: The value does not match bits requested")
             expect(response.success).to be false
         end
 
         it "Calls the method append when value is not correct" do
-            request = ["Jhon","0","60", "2"]
+            request = ["append","Jhon","0", "80","2"]
             response = @business_logic.append(request,"Doe")
             expect(response.message).to eq("ERROR: The value does not match bits requested")
             expect(response.success).to be false
         end
 
         it "Calls the method prepend when value is not correct" do
-            request = ["Jhon","0","60", "2"]
+            request = ["prepend","Jhon","0", "80","2"]
             response = @business_logic.prepend(request,"Doe")
             expect(response.message).to eq("ERROR: The value does not match bits requested")
             expect(response.success).to be false
         end
 
         it "Calls the method cas when value is not correct" do
-            request = ["Jhon","0","60", "2","0"]
+            request = ["cas","Jhon","0", "80","2"]
             response = @business_logic.cas(request,"Doe")
             expect(response.message).to eq("ERROR: The value does not match bits requested")
             expect(response.success).to be false
@@ -139,6 +139,16 @@ RSpec.describe BusinessLogic do
             expect(response).to be false
         end
 
+        it "Calls the method is_number? with correct value" do
+            response = @business_logic.is_number?("1")
+            expect(response).to be true
+        end
+
+        it "Calls the method is_number? with correct value" do
+            response = @business_logic.is_number?("A")
+            expect(response).to be false
+        end
+
         it "Calls the method parse_flag with correct flag" do
             flag = @business_logic.parse_flag("4")
             expect(flag).to eq(4)
@@ -157,30 +167,6 @@ RSpec.describe BusinessLogic do
         it "Calls the method parse_modification_value with correct modification_value" do
             modification_value = @business_logic.parse_modification_value("4")
             expect(modification_value).to eq(4)
-        end
-
-        it "Calls the method parse_flag with incorrect flag" do
-            response = @business_logic.parse_flag("a")
-            expect(response.message).to eq("ERROR: Flag must be an integer")
-            expect(response.success).to be false
-        end
-
-        it "Calls the method parse_time with incorrect time" do
-            response = @business_logic.parse_time("a")
-            expect(response.message).to eq("ERROR: Time must be an integer")
-            expect(response.success).to be false
-        end
-
-        it "Calls the method parse_bits with incorrect bits" do
-            response = @business_logic.parse_bits("a")
-            expect(response.message).to eq("ERROR: Bits must be an integer")
-            expect(response.success).to be false
-        end
-
-        it "Calls the method parse_modification_value with incorrect modification_value" do
-            response = @business_logic.parse_modification_value("a")
-            expect(response.message).to eq("ERROR: Modification value must be an integer")
-            expect(response.success).to be false
         end
     end
 end

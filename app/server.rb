@@ -1,7 +1,7 @@
 require_relative 'multiclient_tcp_server'
 require_relative 'business_logic'
 
-srv = MulticlientTCPServer.new( 2000, 2000, true )
+srv = MulticlientTCPServer.new( 2121, 3600, true )
 businessLogic = BusinessLogic.new
 
 loop do
