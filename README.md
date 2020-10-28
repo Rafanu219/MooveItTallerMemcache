@@ -1,5 +1,5 @@
 Para correr el server debemos ejecutar el comando ruby server.rb estando en la carpeta app.
-Luego ejecutar en una terminal telnet localhost 2000
+Luego ejecutar en una terminal telnet localhost 2121
 
 Para correr un demo client debemos ejecutar el server primero y despues ejecutar el comando ruby client.rb
 

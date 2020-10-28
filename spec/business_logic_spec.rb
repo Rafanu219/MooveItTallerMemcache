@@ -121,7 +121,7 @@ RSpec.describe BusinessLogic do
         end
 
         it "Calls the method validate_retrieval_command with wrong number of arguments" do
-            request = ["get","Jhon","0"]
+            request = ["get"]
             response = @business_logic.validate_retrieval_command(request)
             expect(response.message).to eq("ERROR: Wrong number of arguments")
             expect(response.success).to be false
@@ -149,24 +149,9 @@ RSpec.describe BusinessLogic do
             expect(response).to be false
         end
 
-        it "Calls the method parse_flag with correct flag" do
-            flag = @business_logic.parse_flag("4")
-            expect(flag).to eq(4)
-        end
-
-        it "Calls the method parse_time with correct flag" do
-            time = @business_logic.parse_time("4")
-            expect(time).to eq(4)
-        end
-
-        it "Calls the method parse_bits with correct bits" do
-            bits = @business_logic.parse_bits("4")
-            expect(bits).to eq(4)
-        end
-
-        it "Calls the method parse_modification_value with correct modification_value" do
-            modification_value = @business_logic.parse_modification_value("4")
-            expect(modification_value).to eq(4)
+        it "Calls the method parse with correct flag" do
+            number = @business_logic.parse("4")
+            expect(number).to eq(4)
         end
     end
 end

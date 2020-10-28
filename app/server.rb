@@ -1,93 +1,91 @@
-require_relative 'multiclient_tcp_server'
+require 'socket'
 require_relative 'business_logic'
+class Server
+  server = TCPServer.new(2121)
+  businessLogic = BusinessLogic.new
 
-srv = MulticlientTCPServer.new( 2121, 3600, true )
-businessLogic = BusinessLogic.new
+  loop do
+    Thread.start(server.accept) do |connection|
+      while line = connection.gets
+        break if line =~ "quit"
+        request = line.split
+        command = request[0]
+        case command
+        when "get"
+          response = businessLogic.validate_retrieval_command(request)
+          if response.success == true
+              response = businessLogic.get(request)
+              connection.puts response.message + "\n"
+          else
+              connection.puts response.message + "\n"
+          end
+        when "gets"
 
-loop do
-    if sock = srv.get_socket
-        # a message has arrived, it must be read from sock
-        message = sock.gets( "\r\n" ).chomp( "\r\n" )
-        # arbitrary examples how to handle incoming messages:
-            request = message.split
-            command = request[0]
-            case command
-            when "get"
-              response = businessLogic.validate_retrieval_command(request)
-              if response.success == true
-                response = businessLogic.get(request)
-                sock.write response.message + "\n"
-              else
-                sock.write response.message + "\n"
-              end
-            when "gets"
-              response = businessLogic.validate_retrieval_command(request)
-              if response.success == true
-                response = businessLogic.gets(request)
-                sock.write response.message + "\n"
-              else
-                sock.write response.message + "\n"
-              end
-            when "set"
-              response = businessLogic.validate_storage_command(request)
-              if response.success == true
-                value = sock.gets( "\r\n" ).chomp( "\r\n" )
-                response = businessLogic.set(request,value)
-                sock.write response.message + "\n"
-              else
-                sock.write response.message + "\n"
-              end
-            when "append"
-              response = businessLogic.validate_storage_command(request)
-              if response.success == true
-                value = sock.gets( "\r\n" ).chomp( "\r\n" )
-                response = businessLogic.append(request,value)
-                sock.write response.message + "\n"
-              else
-                sock.write response.message + "\n"
-              end
-            when "prepend"
-              response = businessLogic.validate_storage_command(request)
-              if response.success == true
-                value = sock.gets( "\r\n" ).chomp( "\r\n" )
-                response = businessLogic.prepend(request,value)
-                sock.write response.message + "\n"
-              else
-                sock.write response.message + "\n"
-              end
-            when "add"
-              response = businessLogic.validate_storage_command(request)
-              if response.success == true
-                value = sock.gets( "\r\n" ).chomp( "\r\n" )
-                response = businessLogic.add(request,value)
-                sock.write response.message + "\n"
-              else
-                sock.write response.message + "\n"
-              end
-            when "cas"
-              response = businessLogic.validate_cas_storage_command(request)
-              if response.success == true
-                value = sock.gets( "\r\n" ).chomp( "\r\n" )
-                response = businessLogic.cas(request,value)
-                sock.write response.message + "\n"
-              else
-                sock.write response.message + "\n"
-              end
-            when "replace"
-              response = businessLogic.validate_storage_command(request)
-              if response.success == true
-                value = sock.gets( "\r\n" ).chomp( "\r\n" )
-                response = businessLogic.replace(request,value)
-                sock.write response.message + "\n"
-              else
-                sock.write response.message + "\n"
-              end
-            when "quit"
-              raise SystemExit
-            else 
-              sock.write "ERROR\n"
-            end
-    else
-        sleep 0.01 # free CPU for other jobs, humans won't notice this latency
+          response = businessLogic.validate_retrieval_command(request)
+          if response.success == true
+            response = businessLogic.gets(request)
+            connection.puts response.message + "\n"
+          else
+              connection.puts response.message + "\n"
+          end
+        when "set"
+          response = businessLogic.validate_storage_command(request)
+          if response.success == true
+            value = connection.gets( "\r\n" ).chomp( "\r\n" )
+            response = businessLogic.set(request,value)
+            connection.puts response.message + "\n"
+          else
+              connection.puts response.message + "\n"
+          end
+        when "append"
+          response = businessLogic.validate_storage_command(request)
+          if response.success == true
+            value = connection.gets( "\r\n" ).chomp( "\r\n" )
+            response = businessLogic.append(request,value)
+            connection.puts response.message + "\n"
+          else
+              connection.puts response.message + "\n"
+          end
+        when "prepend"
+          response = businessLogic.validate_storage_command(request)
+          if response.success == true
+            value = connection.gets( "\r\n" ).chomp( "\r\n" )
+            response = businessLogic.prepend(request,value)
+            connection.puts response.message + "\n"
+          else
+              connection.puts response.message + "\n"
+          end
+        when "add"
+          response = businessLogic.validate_storage_command(request)
+          if response.success == true
+            value = connection.gets( "\r\n" ).chomp( "\r\n" )
+            response = businessLogic.add(request,value)
+            connection.puts response.message + "\n"
+          else
+              connection.puts response.message + "\n"
+          end
+        when "cas"
+          response = businessLogic.validate_cas_storage_command(request)
+          if response.success == true
+            value = connection.gets( "\r\n" ).chomp( "\r\n" )
+            response = businessLogic.cas(request,value)
+            connection.puts response.message + "\n"
+          else
+              connection.puts response.message + "\n"
+          end
+        when "replace"
+          response = businessLogic.validate_storage_command(request)
+          if response.success == true
+            value = connection.gets( "\r\n" ).chomp( "\r\n" )
+            response = businessLogic.replace(request,value)
+            connection.puts response.message + "\n"
+          else
+              connection.puts response.message + "\n"
+          end
+        else 
+          connection.puts "ERROR\n"
+        end
+      end
     end
+  end
 end
