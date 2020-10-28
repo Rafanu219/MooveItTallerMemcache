@@ -10,54 +10,54 @@ Desde ahi podemos probar las funcionalidades de memcache por ejemplo:
 set Jhon 1 800 3
 Doe
 
-Mensaje esperado:STORED
-----------------------------------------
+Mensaje esperado : STORED
+___________________________________________________
 add Jane 2 800 3
 Doe
 
 Mensaje esperado:STORED
-----------------------------------------
+___________________________________________________
 replace Jhon 2 800 6
 Garcia
 
 Mensaje esperado:STORED
-----------------------------------------
+___________________________________________________
 append Jane 2 800 7
  Garcia
 
 Mensaje esperado:STORED
-----------------------------------------
+___________________________________________________
 prepend Jhon 1 800 4
 Doe <-- deje un espacio despues de doe
 
 Mensaje esperado:STORED
-----------------------------------------
+___________________________________________________
 get Jhon
 
 Mensaje esperado:
 VALUE Jhon 2 10
 Doe Garcia
 END
-----------------------------------------
+___________________________________________________
 gets Jane
 
 Mensaje esperado:
 VALUE Jane 2 10 4
 Doe Garcia
-----------------------------------------
+___________________________________________________
 cas Jane 1 800 3 4
 Doe
 
 Mensaje esperado:
 STORED
-----------------------------------------
+___________________________________________________
 get Jane
 
 Mensaje esperado:
 VALUE Jane 1 3
 Doe
 END
-----------------------------------------
+___________________________________________________
 
 Finalmente para correr los test hay que ejecutar el comando rspec con la gema rspec instalada
 
